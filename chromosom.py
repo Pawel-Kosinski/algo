@@ -1,4 +1,5 @@
 import random
+import math
 
 #cały chromosom działa na zadanym przedziale (bez obliczania jeszcze odpowiedniego ciągu znaków od książka)
 #chromosom przyjmuje póki co tylko x
@@ -8,18 +9,27 @@ import random
 #funkcja multuplication która obsługuje różne rodzaje krzyżowań, mutacji (wybór przez string) z zadanym prawdopodobieństwem - na binarnych
 #multiplication zwraca listę skrzyżowanych, zmutowanych, dziesiętnych liczb
 
+#Zmienne określające zakres działań, zmienialne są w mainie; default [-10,10]
+rangeA = -10
+rangeB = 10
+#Określa dokładność binarnej reprezentacji chromosomu np. do 6 cyfr znaczących
+decimalApprox = 6
+#Długość łańcucha binarnego chromosomu
+bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**6))+math.log2(1))
+
 #funckja dec to bin jest do dostosowania - zgodnie ze wzorem książka + konfiguracja dokładności
-def dec_to_bin(dec:float , a : float, b: float) -> str:
+def dec_to_bin(dec:float) -> str:
     """zamiana chromosomu na binarny
         n : podawana wartosc z przedzialu
         a : poczatek przedzialu
         b : koniec przedzialu """
     dec = round(dec)
-    if not a <= dec <= b:
-        raise ValueError(f"Input should be within the interval [{a}, {b}]")
+    
+    if not rangeA <= dec <= rangeB:
+        raise ValueError(f"Input should be within the interval [{rangeA}, {rangeB}]")
     return format(dec & 0b1111111111111111111111111, '025b')
 
-def bin_to_dec(bin:str, a : float, b: float):
+def bin_to_dec(bin:str):
     """zamiana chromosomu na int
         n : podawana wartosc z przedzialu
         a : poczatek przedzialu
@@ -27,11 +37,8 @@ def bin_to_dec(bin:str, a : float, b: float):
     return int(bin, 2)
 
 class Chromosome:
-    def __init__(self, a: float, b: float):
-        """przedzial od a do b"""
-        self.a = a
-        self.b = b
-        self.chromosome = [random.uniform(self.a, self.b) for _ in range(100)] #przedział [a,b]
+    def __init__(self):
+        self.chromosome = [random.uniform(rangeA, rangeB) for _ in range(100)] #przedział [a,b]
 
     def edge_mutation(self, child, mutation_prob):
         if random.random() < mutation_prob:
@@ -56,7 +63,7 @@ class Chromosome:
         new_generation = []
         for _ in range(100):
             parent1, parent2 = random.sample(parents, 2)
-            parent1, parent2 = dec_to_bin(parent1,self.a,self.b), dec_to_bin(parent2,self.a,self.b)
+            parent1, parent2 = dec_to_bin(parent1), dec_to_bin(parent2)
 
             if crossover_type == "one_point":
                 crossover_point = random.randint(1, len(parent1) - 1)
@@ -90,5 +97,5 @@ class Chromosome:
             elif mutation_type == "two_point":
                 child = self.two_point_mutation(child, mutation_prob)
 
-            new_generation.append(bin_to_dec(child,self.a,self.b))
+            new_generation.append(bin_to_dec(child))
         return new_generation
