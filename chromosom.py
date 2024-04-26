@@ -15,26 +15,33 @@ rangeB = 10
 #Określa dokładność binarnej reprezentacji chromosomu np. do 6 cyfr znaczących
 decimalApprox = 6
 #Długość łańcucha binarnego chromosomu
-bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**6))+math.log2(1))
+bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
+#Powyższe zmienne są ustawione DEFAULTOWO, można je zmieniać w mainie za pomocą poniższej funkcji:
+def set_const (valueA:float,valueB:float,approxValue:int):
+    '''Funkcja zmieniajace stale uzywane w chromosom i aktualizujaca bin_len\n
+        valueA - ustawia zakres działań od\n
+        valueB - ustawia zakres działań do\n
+        approxValue - ustawia dokładność bin reprezentacji chromosomu, liczba cyfr znaczacych'''
+    global rangeA, rangeB, decimalApprox, bin_len
+    rangeA = valueA
+    rangeB = valueB
+    decimalApprox = approxValue
+    bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
 
 #funckja dec to bin jest do dostosowania - zgodnie ze wzorem książka + konfiguracja dokładności
 def dec_to_bin(dec:float) -> str:
-    """zamiana chromosomu na binarny
-        n : podawana wartosc z przedzialu
-        a : poczatek przedzialu
-        b : koniec przedzialu """
-    dec = round(dec)
-    
+    """zamiana chromosomu na binarny\n
+        dec : podawana wartosc dziesietna"""
     if not rangeA <= dec <= rangeB:
         raise ValueError(f"Input should be within the interval [{rangeA}, {rangeB}]")
-    return format(dec & 0b1111111111111111111111111, '025b')
+    scaled_value = int((dec - rangeA) / (rangeB - rangeA) * (2**bin_len - 1))
+    return format(scaled_value, f'0{bin_len}b')
 
 def bin_to_dec(bin:str):
-    """zamiana chromosomu na int
-        n : podawana wartosc z przedzialu
-        a : poczatek przedzialu
-        b : koniec przedzialu """
-    return int(bin, 2)
+    """zamiana chromosomu na int\n
+        bin : podawana wartosc binarna"""
+    integer = int(bin, 2)  # bin to integer
+    return rangeA + integer * (rangeB - rangeA) / (2**bin_len - 1)
 
 class Chromosome:
     def __init__(self):
