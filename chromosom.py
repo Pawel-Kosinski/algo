@@ -1,4 +1,5 @@
 import random
+import math
 
 #cały chromosom działa na zadanym przedziale (bez obliczania jeszcze odpowiedniego ciągu znaków od książka)
 #chromosom przyjmuje póki co tylko x
@@ -8,21 +9,49 @@ import random
 #funkcja multuplication która obsługuje różne rodzaje krzyżowań, mutacji (wybór przez string) z zadanym prawdopodobieństwem - na binarnych
 #multiplication zwraca listę skrzyżowanych, zmutowanych, dziesiętnych liczb
 
+#Zmienne określające zakres działań, zmienialne są w mainie; default [-10,10]
+rangeA = -10
+rangeB = 10
+#Określa dokładność binarnej reprezentacji chromosomu np. do 6 cyfr znaczących
+decimalApprox = 6
+#Długość łańcucha binarnego chromosomu
+bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
+#liczba potomków generowanych w każdej nowej generacji 
+#(CHYBA DZIALA)
+childPerGen = 100
+#Powyższe zmienne są ustawione DEFAULTOWO, można je zmieniać w mainie za pomocą poniższej funkcji:
+def set_const (valueA:float,valueB:float,approxValue:int,childCount:int):
+    '''Funkcja zmieniajace stale uzywane w chromosom i aktualizujaca bin_len\n
+        valueA - zakres działań od\n
+        valueB - zakres działań do\n
+        approxValue - dokładność bin reprezentacji chromosomu, liczba cyfr znaczacych\n
+        childCount - liczba potomków w generacji'''
+    global rangeA, rangeB, decimalApprox, bin_len, childPerGen
+    rangeA = valueA
+    rangeB = valueB
+    decimalApprox = approxValue
+    bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
+    childPerGen = childCount
 
 
 #funckja dec to bin jest do dostosowania - zgodnie ze wzorem książka + konfiguracja dokładności
-def dec_to_bin(n):
-    n = round(n)
-    if not -10 <= n <= 10:
-        raise ValueError("Input should be within the interval [-10, 10]")
-    return format(n & 0b1111111111111111111111111, '025b')
+def dec_to_bin(dec:float) -> str:
+    """zamiana chromosomu na binarny\n
+        dec : podawana wartosc dziesietna"""
+    if not rangeA <= dec <= rangeB:
+        raise ValueError(f"Input should be within the interval [{rangeA}, {rangeB}]")
+    scaled_value = int((dec - rangeA) / (rangeB - rangeA) * (2**bin_len - 1))
+    return format(scaled_value, f'0{bin_len}b')
 
-def bin_to_dec(b):
-    return int(b, 2)
+def bin_to_dec(bin:str):
+    """zamiana chromosomu na int\n
+        bin : podawana wartosc binarna"""
+    integer = int(bin, 2)  # bin to integer
+    return rangeA + integer * (rangeB - rangeA) / (2**bin_len - 1)
 
 class Chromosome:
     def __init__(self):
-        self.chromosome = [random.uniform(-10, 10) for _ in range(100)] #przedział [-10, 10]
+        self.chromosome = [random.uniform(rangeA, rangeB) for _ in range(100)] #przedział [a,b]
 
     def edge_mutation(self, child, mutation_prob):
         if random.random() < mutation_prob:
@@ -45,7 +74,7 @@ class Chromosome:
 
     def multiplication(self, parents, crossover_type="two_point", mutation_type="edge", mutation_prob=0.2):
         new_generation = []
-        for _ in range(100):
+        for _ in range(childPerGen):
             parent1, parent2 = random.sample(parents, 2)
             parent1, parent2 = dec_to_bin(parent1), dec_to_bin(parent2)
 

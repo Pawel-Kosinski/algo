@@ -1,5 +1,6 @@
 import sys
 
+#róbcie komentarze dzbany, nie wiem co co robi
 
 class Population:
     def __init__(self, chromosome):
