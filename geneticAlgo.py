@@ -2,7 +2,7 @@ from population import Population
 from chromosom import Chromosome
 from chromosom import set_const
 
-set_const(-10,10,25)
+set_const(-10,10,25,100)
 
 chromosome = Chromosome() 
 best_solutions = []

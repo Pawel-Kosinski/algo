@@ -16,17 +16,23 @@ rangeB = 10
 decimalApprox = 6
 #Długość łańcucha binarnego chromosomu
 bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
+#liczba potomków generowanych w każdej nowej generacji 
+#(CHYBA DZIALA)
+childPerGen = 100
 #Powyższe zmienne są ustawione DEFAULTOWO, można je zmieniać w mainie za pomocą poniższej funkcji:
-def set_const (valueA:float,valueB:float,approxValue:int):
+def set_const (valueA:float,valueB:float,approxValue:int,childCount:int):
     '''Funkcja zmieniajace stale uzywane w chromosom i aktualizujaca bin_len\n
-        valueA - ustawia zakres działań od\n
-        valueB - ustawia zakres działań do\n
-        approxValue - ustawia dokładność bin reprezentacji chromosomu, liczba cyfr znaczacych'''
-    global rangeA, rangeB, decimalApprox, bin_len
+        valueA - zakres działań od\n
+        valueB - zakres działań do\n
+        approxValue - dokładność bin reprezentacji chromosomu, liczba cyfr znaczacych\n
+        childCount - liczba potomków w generacji'''
+    global rangeA, rangeB, decimalApprox, bin_len, childPerGen
     rangeA = valueA
     rangeB = valueB
     decimalApprox = approxValue
     bin_len = math.ceil(math.log2((rangeB-rangeA)*(10**decimalApprox)))
+    childPerGen = childCount
+
 
 #funckja dec to bin jest do dostosowania - zgodnie ze wzorem książka + konfiguracja dokładności
 def dec_to_bin(dec:float) -> str:
@@ -68,7 +74,7 @@ class Chromosome:
 
     def multiplication(self, parents, crossover_type="two_point", mutation_type="edge", mutation_prob=0.2):
         new_generation = []
-        for _ in range(100):
+        for _ in range(childPerGen):
             parent1, parent2 = random.sample(parents, 2)
             parent1, parent2 = dec_to_bin(parent1), dec_to_bin(parent2)
 
