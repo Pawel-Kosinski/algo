@@ -72,6 +72,7 @@ class Chromosome:
         która wykonuje zadane krzyżowanie i mutację na podanej populacji osobników."""
 
     def __init__(self):
+        '''Tworzy tablicę losowych wartości od rangeA do rangeB.'''
         self.chromosome = [random.uniform(rangeA, rangeB) for _ in range(100)] # Przedział [a,b]
 
     def one_point_crossover(self, parent1, parent2):
