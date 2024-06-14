@@ -7,10 +7,6 @@ import sympy as sp
 
 
 
-
-
-
-
 class GUI(ctk.CTk):
 
     def __init__(self,app_name : str,resolution : str):
