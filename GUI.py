@@ -134,10 +134,17 @@ class GUI(ctk.CTk):
         result_Label = ctk.CTkLabel(master=result_Window, text="The smallest best sollution:")
         result_Label.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
+
         xVar_Label = ctk.CTkLabel(master=result_Window, text=f"x: {result[0]:.8f}")
         xVar_Label.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
 
         yVar_Label = ctk.CTkLabel(master=result_Window, text=f"y: {1/result[1]:.8f}")
+
+        xVar_Label = ctk.CTkLabel(master=result_Window, text=f"x: {result[0]}")
+        xVar_Label.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+
+        yVar_Label = ctk.CTkLabel(master=result_Window, text=f"y: {result[0]}")
+
         yVar_Label.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
 
         close_Button = ctk.CTkButton(master=result_Window, text="Close", command=result_Window.destroy)
@@ -208,6 +215,7 @@ class GUI(ctk.CTk):
             except ValueError as error:
                 self.display_Error_Window("InCorrect Input")
                 self.reset_Widgets_Input()
+
                 return 0
     
         self.display_Result_Window(self.population.print_Best(self.best_Solutions))   
