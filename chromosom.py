@@ -1,80 +1,75 @@
 import random
 import math
 
+# Zmienne globalne określające zakres i inne parametry
+rangeA = -10
+rangeB = 10
+decimalApprox = 6
+bin_len = None
+childPerGen = 100
 
-rangeStart = -10
-rangeEnd = 10
-decimalApproximation = 6                                                                
-bin_len = math.ceil(math.log2((rangeEnd-rangeStart) * (10 ** decimalApproximation)))       
-childPerGen = 100                                                                          
+def set_const(valueA: float, valueB: float, approxValue: int, childCount: int, num_params: int):
+    '''Funkcja zmieniająca stałe używane w chromosomie i aktualizująca bin_len.'''
+    global rangeA, rangeB, decimalApprox, bin_len, childPerGen
+    rangeA = valueA
+    rangeB = valueB
+    decimalApprox = approxValue
+    bin_len = math.ceil(math.log2((rangeB - rangeA) * (10 ** decimalApprox))) * num_params
+    childPerGen = childCount
 
+def dec_to_bin(dec: list) -> str:
+    """Zamiana listy liczb dziesiętnych na jeden ciąg binarny."""
+    binary_string = ""
+    param_bin_len = bin_len // len(dec)
+    for val in dec:
+        if not rangeA <= val <= rangeB:
+            raise ValueError(f"Input should be within the interval [{rangeA}, {rangeB}]")
+        scaled_value = int((val - rangeA) / (rangeB - rangeA) * (2 ** param_bin_len - 1))
+        binary_string += format(scaled_value, f'0{param_bin_len}b')
+    return binary_string
 
-def set_Global_Values(start_Value : float, end_Value : float, number_Of_Approx_Bits : int, population_Amount : int) -> None:
-    "Funkcja ustawia zmienne Globalne" 
-    global rangeStart, rangeEnd, decimalApproximation, bin_len, childPerGen
-
-    rangeStart = start_Value
-    rangeEnd = end_Value
-    decimalApproximation = number_Of_Approx_Bits
-    bin_len = math.ceil(math.log2((rangeEnd - rangeStart) * (10 ** decimalApproximation)))
-    childPerGen = population_Amount
-
-
-def convert_Dec_to_Bin(dec : float) -> str:
-    "Zamiana liczby decymalnej na binarna"
-    if not rangeStart <= dec <= rangeEnd:
-        raise ValueError(f"Input should be within the interval [{rangeStart}, {rangeEnd}]")
-    
-    scaled_value = int((dec - rangeStart) / (rangeEnd - rangeStart) * (2 ** bin_len - 1))
-    return format(scaled_value, f'0{bin_len}b')
-
-
-def convert_Bin_to_Dec(bin : str) -> float:
-    "Zamienia liczbe binarną na decymalna"
-    integer = int(bin, 2)  
-    return rangeStart + integer * (rangeEnd - rangeStart) / (2 ** bin_len - 1)
-
-
+def bin_to_dec(bin_str: str, num_params: int) -> list:
+    """Zamiana ciągu binarnego na listę liczb dziesiętnych."""
+    param_len = len(bin_str) // num_params
+    dec_values = []
+    for i in range(num_params):
+        bin_part = bin_str[i * param_len:(i + 1) * param_len]
+        integer = int(bin_part, 2)
+        dec_values.append(rangeA + integer * (rangeB - rangeA) / (2 ** param_len - 1))
+    return dec_values
 
 class Chromosome:
-    """Klasa Chromosome zawiera metody do przeprowadzania krzyżowania i mutacji na chromosomach oraz funkcję multiplication,
-        która wykonuje zadane krzyżowanie i mutację na podanej populacji osobników."""
+    def __init__(self, num_params: int):
+        '''Tworzy tablicę losowych wartości dla każdego z parametrów od rangeA do rangeB.'''
+        self.num_params = num_params
+        self.chromosome = [[random.uniform(rangeA, rangeB) for _ in range(num_params)] for _ in range(100)]
 
-    def __init__(self):
-        "Tworzy tablicę losowych wartości od rangeStart do rangeEnd."
-        self.chromosome = [random.uniform(rangeStart, rangeEnd) for _ in range(100)] 
-
-
-    def one_Point_Crossover(self, parent1 : str, parent2 : str) -> str:
-        "Przeprowadza krzyżowanie jednopunktowe między dwoma rodzicami."
-        crossover_Point = random.randint(1, len(parent1) - 1)
-        child = parent1[:crossover_Point] + parent2[crossover_Point:]
+    def one_point_crossover(self, parent1, parent2):
+        """Przeprowadza krzyżowanie jednopunktowe między dwoma rodzicami."""
+        crossover_point = random.randint(1, len(parent1) - 1)
+        child = parent1[:crossover_point] + parent2[crossover_point:]
         return child
 
-
-    def two_Point_Crossover(self, parent1 : str, parent2 : str) -> str:
-        "Przeprowadza krzyżowanie dwupunktowe między dwoma rodzicami."
-        cross_Point_One, cross_Point_Two = sorted(random.sample(range(1, len(parent1) - 1), 2)) 
-        child = parent1[:cross_Point_One] + parent2[cross_Point_One : cross_Point_Two] + parent1[cross_Point_Two:]
+    def two_point_crossover(self, parent1, parent2):
+        """Przeprowadza krzyżowanie dwupunktowe między dwoma rodzicami."""
+        cp1, cp2 = sorted(random.sample(range(1, len(parent1) - 1), 2))
+        child = parent1[:cp1] + parent2[cp1:cp2] + parent1[cp2:]
         return child
 
-
-    def three_Point_Crossover(self, parent1 : str, parent2 : str) -> str:
-        "Przeprowadza krzyżowanie trzypunktowe między dwoma rodzicami."
-        cross_Point_One, cross_Point_Two, cross_Point_Three = sorted(random.sample(range(1, len(parent1) - 1), 3))
-        child = parent1[:cross_Point_One] + parent2[cross_Point_One : cross_Point_Two] + parent1[cross_Point_Two : cross_Point_Three] + parent2[cross_Point_Three:]
+    def three_point_crossover(self, parent1, parent2):
+        """Przeprowadza krzyżowanie trzypunktowe między dwoma rodzicami."""
+        cp1, cp2, cp3 = sorted(random.sample(range(1, len(parent1) - 1), 3))
+        child = parent1[:cp1] + parent2[cp1:cp2] + parent1[cp2:cp3] + parent2[cp3:]
         return child
 
-
-    def uniform_Crossover(self, parent1 : str, parent2 : str) -> str:
-        "Przeprowadza krzyżowanie jednorodne między dwoma rodzicami."
-        child_Bits = [parent1[i] if random.random() < 0.5 else parent2[i] for i in range(len(parent1))]
-        child = ''.join(child_Bits)
+    def uniform_crossover(self, parent1, parent2):
+        """Przeprowadza krzyżowanie jednorodne między dwoma rodzicami."""
+        child_bits = [parent1[i] if random.random() < 0.5 else parent2[i] for i in range(len(parent1))]
+        child = ''.join(child_bits)
         return child
 
-
-    def grainy_Crossover(self, parent1 : str, parent2 : str) -> str:
-        "Przeprowadza krzyżowanie ziarniste między dwoma rodzicami."
+    def grainy_crossover(self, parent1, parent2):
+        """Przeprowadza krzyżowanie ziarniste między dwoma rodzicami."""
         grain_size = random.randint(1, 5)
         child_bits = []
         use_parent1 = True
@@ -87,24 +82,21 @@ class Chromosome:
         child = ''.join(child_bits)
         return child
 
-
-    def edge_Mutation(self, child : str, mutation_prob : float) -> str:
-        "Przeprowadza mutację krawędziową na potomku."
+    def edge_mutation(self, child: str, mutation_prob: float) -> str:
+        """Przeprowadza mutację krawędziową na potomku."""
         if random.random() < mutation_prob:
             child = ('1' if child[0] == '0' else '0') + child[1:-1] + ('1' if child[-1] == '0' else '0')
         return child
 
-
-    def one_Point_Mutation(self, child : str, mutation_prob : float) -> str:
-        "Przeprowadza mutację jednopunktową na potomku."
+    def one_point_mutation(self, child: str, mutation_prob: float) -> str:
+        """Przeprowadza mutację jednopunktową na potomku."""
         if random.random() < mutation_prob:
             mutation_point = random.randint(0, len(child) - 1)
             child = child[:mutation_point] + ('1' if child[mutation_point] == '0' else '0') + child[mutation_point + 1:]
         return child
 
-
-    def two_Point_Mutation(self, child : str, mutation_prob : float) -> str:
-        "Przeprowadza mutację dwupunktową na potomku."
+    def two_point_mutation(self, child: str, mutation_prob: float) -> str:
+        """Przeprowadza mutację dwupunktową na potomku."""
         if random.random() < mutation_prob:
             mp1, mp2 = sorted(random.sample(range(len(child)), 2))
             child = (child[:mp1] + ('1' if child[mp1] == '0' else '0') +
@@ -112,57 +104,41 @@ class Chromosome:
                      child[mp2 + 1:])
         return child
 
-
-    def mutation(self, child : str, mutation_Method : str, mutation_Probability : float) -> str:
-        "Wybiera i przeprowadza odpowiednią metodę mutacji na potomku."
-        
-        if mutation_Method == "Edge Mutation":
-            child = self.edge_Mutation(child, mutation_Probability)
-
-        elif mutation_Method == "One Point Mutation":
-            child = self.one_Point_Mutation(child, mutation_Probability)
-
-        elif mutation_Method == "Two Point Mutation":
-            child = self.two_Point_Mutation(child, mutation_Probability)
-            
+    def mutation(self, child: str, mutation_method: str, mutation_prob: float) -> str:
+        """Wybiera i przeprowadza odpowiednią metodę mutacji na potomku."""
+        if mutation_method == "Edge Mutation":
+            child = self.edge_mutation(child, mutation_prob)
+        elif mutation_method == "One Point Mutation":
+            child = self.one_point_mutation(child, mutation_prob)
+        elif mutation_method == "Two Point Mutation":
+            child = self.two_point_mutation(child, mutation_prob)
         return child
 
-
-    def multiplication(self, parents : list, crossover_Method="two_point", mutation_Method="edge", mutation_Probability=0.2) -> list:
-        '''Funkcja przeprowadzająca krzyżowanie i mutację na podanej populacji.
-
-        Args:
-            parents (list): Populacja osobników do przekształcenia.
-            crossover_type (str): Typ krzyżowania. Domyślnie "two_point".
-            mutation_type (str): Typ mutacji. Domyślnie "edge".
-            mutation_prob (float): Prawdopodobieństwo mutacji. Domyślnie 0.2.
-
-        Returns:
-            list: Nowa populacja po przeprowadzeniu krzyżowania i mutacji.
-        '''
+    def multiplication(self, parents, crossover_type="three_point", mutation_method="Two Point Mutation", mutation_prob=0.2) -> list:
+        """Przeprowadza krzyżowanie i mutację na podanej populacji."""
         new_generation = []
 
         for _ in range(childPerGen):
             parent1, parent2 = random.sample(parents, 2)
-            parent1, parent2 = convert_Dec_to_Bin(parent1), convert_Dec_to_Bin(parent2)
+            parent1_bin, parent2_bin = dec_to_bin(parent1), dec_to_bin(parent2)
 
-            if crossover_Method == "One Point CrossOver":
-                child = self.one_Point_Crossover(parent1, parent2)
+            # Wybór rodzaju krzyżowania
+            if crossover_type == "one_point":
+                child_bin = self.one_point_crossover(parent1_bin, parent2_bin)
+            elif crossover_type == "two_point":
+                child_bin = self.two_point_crossover(parent1_bin, parent2_bin)
+            elif crossover_type == "three_point":
+                child_bin = self.three_point_crossover(parent1_bin, parent2_bin)
+            elif crossover_type == "uniform":
+                child_bin = self.uniform_crossover(parent1_bin, parent2_bin)
+            elif crossover_type == "grainy":
+                child_bin = self.grainy_crossover(parent1_bin, parent2_bin)
+            else:
+                # Domyślne krzyżowanie w przypadku nieznanego typu
+                child_bin = self.two_point_crossover(parent1_bin, parent2_bin)
 
-            elif crossover_Method == "Two Point CrossOver":
-                child = self.two_Point_Crossover(parent1, parent2)
-
-            elif crossover_Method == "Three Point CrossOver":
-                child = self.three_Point_Crossover(parent1, parent2)
-
-            elif crossover_Method == "Uniform CrossOver":
-                child = self.uniform_Crossover(parent1, parent2)
-
-            elif crossover_Method == "Grainy CrossOver":
-                child = self.grainy_Crossover(parent1, parent2)
-
-            child = self.mutation(child, mutation_Method, mutation_Probability)
-
-            new_generation.append(convert_Bin_to_Dec(child))
+            # Mutacja na nowo utworzonym chromosomie
+            child_bin = self.mutation(child_bin, mutation_method, mutation_prob)
+            new_generation.append(bin_to_dec(child_bin, self.num_params))
 
         return new_generation
