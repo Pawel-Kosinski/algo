@@ -1,13 +1,6 @@
 import random
 import math
 
-# Zmienne globalne określające zakres i inne parametry
-rangeA = -20
-rangeB = 20
-decimalApprox = 6
-bin_len = None
-childPerGen = 100
-
 def set_const(valueA: float, valueB: float, approxValue: int, childCount: int, num_params: int):
     '''Funkcja zmieniająca stałe używane w chromosomie i aktualizująca bin_len.'''
     global rangeA, rangeB, decimalApprox, bin_len, childPerGen

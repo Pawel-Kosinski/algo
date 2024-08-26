@@ -9,7 +9,9 @@ class Population:
         """Oblicza wartość funkcji przystosowania dla zestawu parametrów."""
         x = params[0]
         y = params[1]
-        foo_value = (x - y) ** 2 + ((x + y - 10) / 3) ** 2
+        z = params[2]
+        t = params[3]
+        foo_value = (x-5)^2 + (y-2)^2 + (z + 4)^2 + (t+11)^2
         return 1 / (foo_value)  if foo_value != 0 else 999999 # Odwrócenie wartości, aby zminimalizować funkcję
 
     def makePopulation(self) -> list:
@@ -98,10 +100,11 @@ class Population:
         print(f"Parameters: {params}")
         print(f"Fitness: {fitness_value}")
         
+        
         # Optionally, stop the algorithm if the fitness is good enough
-        if fitness_value > 1e6:  # Adjust this threshold based on your problem
-            self.print_best(best_solutions)
-            sys.exit()
+        ##if fitness_value > 1e12:  # Adjust this threshold based on your problem
+            #self.print_best(best_solutions)
+            #sys.exit()
         
         return best_solutions
 

@@ -4,10 +4,10 @@ from chromosom import Chromosome
 from chromosom import set_const
 
 # Ustawienie stałych używanych przez algorytm genetyczny
-set_const(-20, 20, 25, 100, 2)
+set_const(-20, 20, 25, 1000, 4)
 
-# Inicjalizacja obiektu Chromosome, który będzie reprezentował osobniki w populacji
-chromosome = Chromosome(2)
+# Inicjalizacja obiektu Chromosome, który będzie reprezentował osobniki w populacji10
+chromosome = Chromosome(4)
 
 # Inicjalizacja listy przechowującej najlepsze znalezione rozwiązania
 best_solutions = []
@@ -25,7 +25,7 @@ for i in range(1000):
     # Ewolucja populacji - krzyżowanie i mutacja
     population.evolve(
         groups_Amount=groups,
-        selection_Method='Roulette Selection',  # or 'Best Selection' or 'Roulette Selection'
+        selection_Method='Tournament Selection',  # or 'Best Selection' or 'Roulette Selection'
         crossOver_Method='three_point',  # choose between 'one_point', 'two_point', 'three_point', etc.
         mutation_Method='Two Point Mutation',  # choose between 'Edge Mutation', 'One Point Mutation', etc.
         mutation_Probability=0.2  # or any other probability value
