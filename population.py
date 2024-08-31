@@ -11,7 +11,7 @@ class Population:
         y = params[1]
         z = params[2]
         t = params[3]
-        foo_value = (x-5)^2 + (y-2)^2 + (z + 4)^2 + (t+11)^2
+        foo_value = (x-5)**2 + (y-2)**2 + (z + 4)**2 + (t+11)**2
         return 1 / (foo_value)  if foo_value != 0 else 999999 # Odwrócenie wartości, aby zminimalizować funkcję
 
     def makePopulation(self) -> list:
