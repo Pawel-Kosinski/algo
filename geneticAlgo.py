@@ -2,12 +2,38 @@
 from population import Population
 from chromosom import Chromosome
 from chromosom import set_const
+from GUI import GUI
+
+
+class genetic_Algorithm:
+    def __init__(self, app):
+        self.app = app
+        self.chromosome = None
+        self.best_solutions = []
+        self.population = None
+        self.groups = None
+
+        self.app.start_algorithm_Button.configure(command=self.run_genetic_algorithm())
+
+    def run_genetic_algorithm(self):
+        condition = self.app.check_if_correct_entry()
+        self.app.error_list.configure(text=self.app.error_list[condition])
+        if condition != 7:
+            return
+
+        set_const(int(self.app.range_start_entry.get()), int(self.app.range_end_entry.get()),
+                  int(self.app.number_of_bits_entry.get()), int(self.app.population_amount_entry.get()), 5)
+
+        self.chromosome = Chromosome(5)
+        self.population = Population(self.chromosome)
+        self.groups = self.population.how_Many_Groups()
+
 
 # Ustawienie stałych używanych przez algorytm genetyczny
-set_const(-20, 20, 25, 1000, 4)
+set_const(-20, 20, 25, 1000, 5)
 
 # Inicjalizacja obiektu Chromosome, który będzie reprezentował osobniki w populacji10
-chromosome = Chromosome(4)
+chromosome = Chromosome(5)
 
 # Inicjalizacja listy przechowującej najlepsze znalezione rozwiązania
 best_solutions = []
@@ -32,3 +58,4 @@ for i in range(1000):
     )
 # Wyświetlenie najlepszego znalezionego rozwiązania po zakończeniu ewolucji
 population.print_best(best_solutions)
+
