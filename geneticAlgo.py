@@ -13,7 +13,8 @@ class GeneticAlgorithm:
         self.population = None
         self.groups = None
 
-        self.equation_tuple = None
+        self.equation_vars = None
+        self.equation = None
         self.interval_start = None
         self.interval_end = None
         self.approximation_bits = None
@@ -28,7 +29,8 @@ class GeneticAlgorithm:
         self.app.algorithm_activation_button.configure(command=self.start_algorithm)
 
     def update_records(self):
-        self.equation_tuple = self.app.equation_frame.get_entry_content()
+        self.equation_vars = self.app.equation_frame.get_entry_content()[0]
+        self.equation = self.app.equation_frame.get_entry_content()[1]
         self.interval_start = self.app.interval_start_frame.get_entry_content()
         self.interval_end = self.app.interval_end_frame.get_entry_content()
         self.approximation_bits = self.app.interval_start_frame.get_entry_content()
@@ -55,13 +57,28 @@ class GeneticAlgorithm:
             return
 
         self.update_records()
-        print(self.equation_tuple)
+        set_const(self.interval_start, self.interval_end, self.approximation_bits, self.child_count, len(self.equation_vars))
+        self.chromosome = Chromosome(len(self.equation_vars), self.equation_vars, self.equation)
+        self.population = Population(self.chromosome)
+        self.groups = self.population.how_Many_Groups(self.groups_amount)
+
+        for i in range(1000):
+            self.best_solutions = self.population.best_solution(i, self.best_solutions)
+            (self.population.evolve
+                (
+                    groups_Amount=self.groups,
+                    selection_Method=self.selection_method,
+                    crossOver_Method=self.crossover_method,
+                    mutation_Method=self.mutation_method,
+                    mutation_Probability=self.mutation_probability
+                ))
+        self.population.print_best(self.best_solutions)
 
 
 program = GeneticAlgorithm()
 program.app.run_gui()
 
-""""# Ustawienie stałych używanych przez algorytm genetyczny
+"""
 set_const(-20, 20, 25, 1000, 5)
 
 # Inicjalizacja obiektu Chromosome, który będzie reprezentował osobniki w populacji10

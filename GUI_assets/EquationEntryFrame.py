@@ -37,6 +37,6 @@ class EquationEntryFrame(EntryFrame):
     def get_entry_content(self):
         variables = list(self.left_expr.free_symbols.union(self.right_expr.free_symbols))
         equation = self.left_expr - self.right_expr
-        self.variables = [str(var) for var in variables]
+        self.variables = variables
         return self.variables, equation
 

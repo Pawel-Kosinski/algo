@@ -8,13 +8,10 @@ class Population:
 
     def fitness(self, params: list) -> float:
         """Oblicza wartość funkcji przystosowania dla zestawu parametrów."""
-        x = params[0]
-        y = params[1]
-        z = params[2]
-        t = params[3]
-        v = params[4]
-        foo_value = (x-5)**2 + (y-2)**2 + (z + 4)**2 + (t+11)**2 + (v-5)**2
-        return 1 / (foo_value)  if foo_value != 0 else 999999 # Odwrócenie wartości, aby zminimalizować funkcję
+        substitution_dict = dict(zip(self.chromosome.equation_vars, params))
+        foo_value = self.chromosome.equation.subs(substitution_dict)
+
+        return 1 / foo_value if foo_value != 0 else 999999 # Odwrócenie wartości, aby zminimalizować funkcję
 
     def makePopulation(self) -> list:
         population = []

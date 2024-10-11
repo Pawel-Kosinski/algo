@@ -7,13 +7,13 @@ def set_const(valueA: float, valueB: float, approxValue: int, childCount: int, n
     rangeA = valueA
     rangeB = valueB
     decimalApprox = approxValue
-    bin_len = math.ceil(math.log2((rangeB - rangeA) * (10 ** decimalApprox))) * num_params
+    bin_len = abs(math.ceil(math.log2((rangeB - rangeA) * (10 ** decimalApprox)))) * num_params
     childPerGen = childCount
 
 def dec_to_bin(dec: list) -> str:
     """Zamiana listy liczb dziesiętnych na jeden ciąg binarny."""
     binary_string = ""
-    param_bin_len = bin_len // len(dec)
+    param_bin_len = abs(bin_len // len(dec))
     for val in dec:
         if not rangeA <= val <= rangeB:
             raise ValueError(f"Input should be within the interval [{rangeA}, {rangeB}]")
@@ -32,9 +32,11 @@ def bin_to_dec(bin_str: str, num_params: int) -> list:
     return dec_values
 
 class Chromosome:
-    def __init__(self, num_params: int):
+    def __init__(self, num_params: int, equation_vars, equation):
         '''Tworzy tablicę losowych wartości dla każdego z parametrów od rangeA do rangeB.'''
         self.num_params = num_params
+        self.equation_vars = equation_vars
+        self.equation = equation
         self.chromosome = [[random.uniform(rangeA, rangeB) for _ in range(num_params)] for _ in range(100)]
 
     def one_point_crossover(self, parent1, parent2):
