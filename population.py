@@ -1,5 +1,6 @@
-import sys
 import random
+
+
 class Population:
     def __init__(self, chromosome):
         self.chromosome = chromosome
@@ -27,9 +28,7 @@ class Population:
         parents = [ind[0] for ind in sorted(self.population, key=lambda x: x[1], reverse=True)[:10]]
         return parents
     
-    def how_Many_Groups(self) -> int:
-        groups = int(input("How many groups in the tournament? "))
-        # check
+    def how_Many_Groups(self, groups) -> int:
         if len(self.population) % groups != 0:
             raise ValueError("Population size must be divisible by the number of groups")
         return groups

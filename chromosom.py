@@ -116,15 +116,15 @@ class Chromosome:
             parent1_bin, parent2_bin = dec_to_bin(parent1), dec_to_bin(parent2)
 
             # Wybór rodzaju krzyżowania
-            if crossover_type == "one_point":
+            if crossover_type == "One Point Crossover":
                 child_bin = self.one_point_crossover(parent1_bin, parent2_bin)
-            elif crossover_type == "two_point":
+            elif crossover_type == "Two Point Crossover":
                 child_bin = self.two_point_crossover(parent1_bin, parent2_bin)
-            elif crossover_type == "three_point":
+            elif crossover_type == "Three Point Crossover":
                 child_bin = self.three_point_crossover(parent1_bin, parent2_bin)
-            elif crossover_type == "uniform":
+            elif crossover_type == "Uniform Crossover":
                 child_bin = self.uniform_crossover(parent1_bin, parent2_bin)
-            elif crossover_type == "grainy":
+            elif crossover_type == "Grainy Crossover":
                 child_bin = self.grainy_crossover(parent1_bin, parent2_bin)
             else:
                 # Domyślne krzyżowanie w przypadku nieznanego typu
